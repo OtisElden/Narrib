@@ -8,14 +8,12 @@
 
     <button id="makebig">MAKE BIG</button>
 
+
     <div class="header">
         <h1>Webpage</h1>
     </div>
 
-    <div class="section">
-        <label for="importedPortion">Total string </label>
-        <input type="text" id="currentImport">
-    </div>
+
 
     <div class="section">
         <label for="currentString">Current string being evaluated:</label>
@@ -37,54 +35,52 @@
         <button id="warningLabel">Warning label for missing portions</button>
     </div>
 
-    <div>
 
-        <ul>
-            <li>
-                <button id="btn911">911</button>
-                <ul>
-                    <li id="btnDispatchedReason911">Dispatched Reason</li>
-                    <li id="btnChiefComplaint911">Chief Complaint</li>
-                    <li id="btnHistory911">History</li>
-                    <li id="btnAssessment911">Assessment</li>
-                    <li id="btnTreatment911">Treatment</li>
-                    <li id="btnTransport911">Transport</li>
-                </ul>
-            </li>
-            <li>
-                <button id="btnTransfer">Transfer</button>
-                <ul>
-                    <li id="btnDispatchedReasonTransfer">Dispatched Reason</li>
-                    <li id="btnChiefComplaintTransfer">Chief Complaint</li>
-                    <li id="btnHistoryTransfer">History</li>
-                    <li id="btnAssessmentTransfer">Assessment</li>
-                    <li id="btnTreatmentTransfer">Treatment</li>
-                    <li id="btnTransportTransfer">Transport</li>
-                </ul>
-            </li>
-            <li>
-                <button id="btnRefusal">Refusal</button>
-                <ul>
-                    <li id="btnDispatchedReasonRefusal">Dispatched Reason</li>
-                    <li id="btnChiefComplaintRefusal">Chief Complaint</li>
-                    <li id="btnHistoryRefusal">History</li>
-                    <li id="btnAssessmentRefusal">Assessment</li>
-                    <li id="btnRefusalDetails">Refusal Details</li>
-                    <li id="btnTransportStatusRefusal">Transport Status</li>
-                </ul>
-            </li>
-            <li>
-                <button id="btnLiftAssist">Lift Assist</button>
-                <ul>
-                    <li id="btnDispatchedReasonLiftAssist">Dispatched Reason</li>
-                    <li id="btnChiefComplaintLiftAssist">Chief Complaint</li>
-                    <li id="btnHistoryLiftAssist">History</li>
-                    <li id="btnAssessmentLiftAssist">Assessment</li>
-                    <li id="btnTransportStatusLiftAssist">Transport Status</li>
-                </ul>
-            </li>
-        </ul>
-    </div>
+    <ul>
+        <li>
+            911
+            <ul>
+                <li><button class="section-button" data-section="911Dispatch" id="911DispatchReason">Dispatched Reason</button></li>
+                <li><button class="section-button" data-section="911Dispatch" id="911ChiefComplaint">Chief Complaint</button></li>
+                <li><button class="section-button" data-section="911Dispatch" id="911History">History</button></li>
+                <li><button class="section-button" data-section="911Dispatch" id="911Assessment">Assessment</button></li>
+                <li><button class="section-button" data-section="911Dispatch" id="911Treatment">Treatment</button></li>
+                <li><button class="section-button" data-section="911Dispatch" id="911Transport">Transport</button></li>
+            </ul>
+        </li>
+        <li>
+            Transfer
+            <ul>
+                <li><button id="btnDispatchedReasonTransfer">Dispatched Reason</button></li>
+                <li><button id="btnChiefComplaintTransfer">Chief Complaint</button></li>
+                <li><button id="btnHistoryTransfer">History</button></li>
+                <li><button id="btnAssessmentTransfer">Assessment</button></li>
+                <li><button id="btnTreatmentTransfer">Treatment</button></li>
+                <li><button id="btnTransportTransfer">Transport</button></li>
+            </ul>
+        </li>
+        <li>
+            Refusal
+            <ul>
+                <li><button id="btnDispatchedReasonRefusal">Dispatched Reason</button></li>
+                <li><button id="btnChiefComplaintRefusal">Chief Complaint</button></li>
+                <li><button id="btnHistoryRefusal">History</button></li>
+                <li><button id="btnAssessmentRefusal">Assessment</button></li>
+                <li><button id="btnRefusalDetails">Refusal Details</button></li>
+                <li><button id="btnTransportStatusRefusal">Transport Status</button></li>
+            </ul>
+        </li>
+        <li>
+            Lift Assist
+            <ul>
+                <li><button id="btnDispatchedReasonLiftAssist">Dispatched Reason</button></li>
+                <li><button id="btnChiefComplaintLiftAssist">Chief Complaint</button></li>
+                <li><button id="btnHistoryLiftAssist">History</button></li>
+                <li><button id="btnAssessmentLiftAssist">Assessment</button></li>
+                <li><button id="btnTransportStatusLiftAssist">Transport Status</button></li>
+            </ul>
+        </li>
+    </ul>
 
 
 
@@ -92,8 +88,6 @@
 
 
 
-
-
-
+<script src="popup.js"></script>
 </body>
 </html>
