@@ -4,7 +4,7 @@
 currentStringField = document.getElementById("currentString");
 
 
-shortcut();
+shortcutKeys();
 
 
 
@@ -23,8 +23,8 @@ function writeSuggestions(passthrough) {
 }
 
 
-// For storing keyboard shortcuts
-function shortcut() {
+// For storing keyboard shortcutKeyss
+function shortcutKeys() {
     currentStringField.addEventListener("keydown", function (event) {
 
         // Grab keypress
@@ -54,7 +54,7 @@ function shortcut() {
         //Push the current working string into the overall narritive, then clear the current string
         if (event.ctrlKey && event.key === "Enter") {
 
-            document.getElementById('narrative').value = document.getElementById('currentString').value + '\n\n';
+            document.getElementById('narrative').value = document.getElementById('narrative').value + document.getElementById('currentString').value + '\n\n';
             document.getElementById('currentString').value = '';
         }
 
@@ -73,7 +73,7 @@ function shortcut() {
 }
 
 
-// Searches strings for DDS mark
+// Searches strings for DDS mark and retusn the position of the DDS as well as the ending position of that word
 function searchDDS() {
 
     let DDS = currentStringField.value.search("DDS");
@@ -152,9 +152,11 @@ fetch(chrome.runtime.getURL('sections.json'))
 //Imports sections of the prewritten narritive into the current text slot
 
 document.querySelectorAll('.section-button').forEach(function (button) {
+
     button.addEventListener('click', function () {
-        const sectionKey = this.getAttribute('data-section');
-        importSections(sectionKey);
+        let sectionKey = this.getAttribute('data-section');
+        let id = this.getAttribute('id');
+        importSections(sectionKey, id);
     });
 });
 
@@ -170,7 +172,28 @@ function importSections(section, id) {
             console.log("buttonWorking");
             document.getElementById("currentString").value = sectionsJson[0]["911"][id];
             //writeSuggestions();
-            //shortcut();
+            //shortcutKeys();
+            break;
+
+        case "transfer":
+            console.log("buttonWorking");
+            document.getElementById("currentString").value = sectionsJson[1]["Transfer"][id];
+            //writeSuggestions();
+            //shortcutKeys();
+            break;
+
+        case "refusal":
+            console.log("buttonWorking");
+            document.getElementById("currentString").value = sectionsJson[2]["Refusal"][id];
+            //writeSuggestions();
+            //shortcutKeys();
+            break;
+
+        case "liftassist":
+            console.log("buttonWorking");
+            document.getElementById("currentString").value = sectionsJson[3]["Lift Assist"][id];
+            //writeSuggestions();
+            //shortcutKeys();
             break;
 
         default:
@@ -199,3 +222,22 @@ function makeIntoWindow() {
         // window is created
     });
 }
+
+
+
+
+
+
+
+// Function to auto-resize the textarea based on its content
+function autoResizeTextarea() {
+    var textarea = document.getElementById('currentString');
+    textarea.style.height = 'auto'; // Reset the height to auto
+    textarea.style.height = textarea.scrollHeight + 'px'; // Set the height to the scrollHeight
+}
+
+// Attach the autoResizeTextarea function to the textarea's input event
+document.getElementById('currentString').addEventListener('input', autoResizeTextarea);
+
+// Optionally, you can call the function initially to set the height based on the content
+autoResizeTextarea();

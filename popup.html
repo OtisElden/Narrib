@@ -3,6 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Narrib</title>
+
+    <style>
+        /* Optional: Define initial styles for the textarea */
+        textarea {
+            resize: none; /* Disable manual resizing */
+            overflow-y: hidden; /* Hide vertical scrollbar initially */
+            width: 200px;
+            min-height: 50px;
+            /*max-width: 400px;
+            max-height: 200px;*/
+        }
+    </style>
+
+
 </head>
 <body>
 
@@ -17,7 +31,8 @@
 
     <div class="section">
         <label for="currentString">Current string being evaluated:</label>
-        <input type="text" id="currentString">
+        <textarea id="currentString"></textarea>
+        <!--<input type="text" id="currentString" style="textarea">-->
     </div>
 
     <div class="section">
@@ -48,36 +63,42 @@
                 <li><button class="section-button" data-section="911Dispatch" id="911Transport">Transport</button></li>
             </ul>
         </li>
+
+
         <li>
             Transfer
             <ul>
-                <li><button id="btnDispatchedReasonTransfer">Dispatched Reason</button></li>
-                <li><button id="btnChiefComplaintTransfer">Chief Complaint</button></li>
-                <li><button id="btnHistoryTransfer">History</button></li>
-                <li><button id="btnAssessmentTransfer">Assessment</button></li>
-                <li><button id="btnTreatmentTransfer">Treatment</button></li>
-                <li><button id="btnTransportTransfer">Transport</button></li>
+                <li><button class="section-button" data-section="transfer" id="transferDispatchReason">Dispatched Reason</button></li>
+                <li><button class="section-button" data-section="transfer" id="transferChiefComplaint">Chief Complaint</button></li>
+                <li><button class="section-button" data-section="transfer" id="transferHistory">History</button></li>
+                <li><button class="section-button" data-section="transfer" id="transferAssessment">Assessment</button></li>
+                <li><button class="section-button" data-section="transfer" id="transferTreatment">Treatment</button></li>
+                <li><button class="section-button" data-section="transfer" id="transferTransport">Transport</button></li>
             </ul>
         </li>
+
+
         <li>
             Refusal
             <ul>
-                <li><button id="btnDispatchedReasonRefusal">Dispatched Reason</button></li>
-                <li><button id="btnChiefComplaintRefusal">Chief Complaint</button></li>
-                <li><button id="btnHistoryRefusal">History</button></li>
-                <li><button id="btnAssessmentRefusal">Assessment</button></li>
-                <li><button id="btnRefusalDetails">Refusal Details</button></li>
-                <li><button id="btnTransportStatusRefusal">Transport Status</button></li>
+                <li><button class="section-button" data-section="refusal" id="refusalDispatchReason">Dispatched Reason</button></li>
+                <li><button class="section-button" data-section="refusal" id="refusalChiefComplaint">Chief Complaint</button></li>
+                <li><button class="section-button" data-section="refusal" id="refusalHistory">History</button></li>
+                <li><button class="section-button" data-section="refusal" id="refusalAssessment">Assessment</button></li>
+                <li><button class="section-button" data-section="refusal" id="refusalRefusal">Refusal Details</button></li>
+                <li><button class="section-button" data-section="refusal" id="refusalClear">Transport Status</button></li>
             </ul>
         </li>
+
+
         <li>
             Lift Assist
             <ul>
-                <li><button id="btnDispatchedReasonLiftAssist">Dispatched Reason</button></li>
-                <li><button id="btnChiefComplaintLiftAssist">Chief Complaint</button></li>
-                <li><button id="btnHistoryLiftAssist">History</button></li>
-                <li><button id="btnAssessmentLiftAssist">Assessment</button></li>
-                <li><button id="btnTransportStatusLiftAssist">Transport Status</button></li>
+                <li><button class="section-button" data-section="liftassist" id="liftassistDispatchReason">Dispatched Reason</button></li>
+                <li><button class="section-button" data-section="liftassist" id="liftassistChiefComplaint">Chief Complaint</button></li>
+                <li><button class="section-button" data-section="liftassist" id="liftassistHistory">History</button></li>
+                <li><button class="section-button" data-section="liftassist" id="liftasssistAssessment">Assessment</button></li>
+                <li><button class="section-button" data-section="liftassist" id="liftassistClear">Transport Status</button></li>
             </ul>
         </li>
     </ul>
