@@ -14,6 +14,96 @@
             /*max-width: 400px;
             max-height: 200px;*/
         }
+
+        body {
+            background-color: #E6E6FA; /* Light blue background */
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            grid-template-rows: auto auto 1fr; /* Three rows with the last one taking the remaining space */
+            gap: 20px; /* Space between grid items */
+            padding: 20px; /* Padding around the grid */
+            font-family: Arial, sans-serif; /* Set a default font */
+        }
+
+        .section {
+            background-color: white; /* White background for sections */
+            border: 1px solid #ccc; /* Border around sections */
+            padding: 10px; /* Padding inside sections */
+            border-radius: 5px; /* Rounded corners for sections */
+        }
+
+        #makebig {
+            grid-column: 1 / span 2; /* Span across both columns */
+            margin-bottom: 10px; /* Margin below the button */
+        }
+
+        /* Assuming #currentString, #listSuggestions, and #narrative are IDs for your textareas */
+        #currentString, #listSuggestions, #narrative {
+            width: 100%; /* Full width of their container */
+            box-sizing: border-box; /* Include padding and border in the width */
+        }
+
+        #currentString {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        #listSuggestions {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        #narrative {
+            grid-column: 1 / span 2; /* Span across both columns */
+            grid-row: 3;
+        }
+
+        .buttons {
+            grid-column: 1 / span 2; /* Span across both columns */
+            display: flex;
+            justify-content: space-between; /* Space out buttons evenly */
+            margin-top: 10px; /* Margin above the button group */
+        }
+
+        ul {
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap; /* Allow list items to wrap */
+            gap: 10px; /* Space between list items */
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .section-button {
+            background-color: #F0F8FF; /* Light blue background for buttons */
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px; /* Rounded corners for buttons */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for buttons */
+        }
+
+            /* Hover effect for buttons */
+            .section-button:hover {
+                background-color: #ADD8E6;
+            }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .section {
+                flex-direction: column;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            ul {
+                flex-direction: column;
+            }
+        }
     </style>
 
 
@@ -21,11 +111,6 @@
 <body>
 
     <button id="makebig">MAKE BIG</button>
-
-
-    <div class="header">
-        <h1>Webpage</h1>
-    </div>
 
 
 
@@ -47,7 +132,6 @@
 
     <div class="section">
         <button id="insertPagePart">Insert part of page</button>
-        <button id="warningLabel">Warning label for missing portions</button>
     </div>
 
 

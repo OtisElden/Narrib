@@ -4,11 +4,73 @@
 currentStringField = document.getElementById("currentString");
 
 
-shortcutKeys();
+
+
+
+//Main function for suggesiton logic
+function subtleSuggestios() {
+
+    //Grab current sentance
+    let currentSentence = grabSentance();
+
+    //Break sentance down into array of words
+    let arrayOfWords = breakDance(currentSentence);
+
+    //Check if words are in the suggestions json
+    let possibleSens = symbolicSiever(arrayOfWords);
+
+    //Sort suggestions by most likely using levenshtein distance
+    let sortedSuggestions = suggestionSorter(possibleSens);
+
+    //Write out suggestions to the html page
+    writeSuggestions(currentSuggestions);
+
+    //Write out suggestion logic here
+    suggestionLogic();
+}
 
 
 
 
+
+//Grab current sentance - NEEDS UPDATING TO WORK
+function grabSentance() {
+
+    let currentString = document.getElementById('currentString').value;
+    console.log(currentString);
+
+    return currentString;
+}
+
+
+//Break words down from sentance into array of words - NEEDS UPDATING TO WORK
+function breakDance(passthrough) {
+
+let currentString = grabSentance();
+    let currentStringArray = currentString.split(" ");
+
+    console.log(currentStringArray);
+
+    return currentStringArray;
+
+}
+
+
+//Check if words are in the array of suggestions - NEEDS UPDATING TO WORK
+function symbolicSiever(passsthrough) {
+
+
+}
+
+
+
+
+
+
+//Displays suggestions in the html page - NEEDS UPDATING TO WORK
+function showeStopper(passThrough) {
+
+}
 
 
 
@@ -241,3 +303,4 @@ document.getElementById('currentString').addEventListener('input', autoResizeTex
 
 // Optionally, you can call the function initially to set the height based on the content
 autoResizeTextarea();
+shortcutKeys();
