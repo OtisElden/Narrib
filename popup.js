@@ -1,200 +1,198 @@
 //JS file for writing narritives
 
+
 //Global variables
+
+//Declare suggestions list
+let globalSuggestions;
+
+//Declares and stores the current sentence starting period/beginning of sentence
+let currentSentenceGlobalStart;
+
+//Declares and stores the current sentence ending period
+let currentSentenceGlobalEnd;
+
+//Declares and stores the current cursor position for updating after suggestions are inserted
+let lastCursorSpot;
+
+//Setup for current string area
 currentStringField = document.getElementById("currentString");
 
 
+//Listeners for the current string field
+document.getElementById('currentString').addEventListener('input', autoResizeTextarea);
+document.getElementById('currentString').addEventListener('keyup', suggestionSupplier);
 
 
+//Main function
+function suggestionSupplier(){
 
-//Main function for suggesiton logic
-function subtleSuggestios() {
+    //Desctrcutres the array into the start and end of the sentence
+    let [sentenceStartPos, sentenceEndPos] = smolGrabber();
 
-    //Grab current sentance
-    let currentSentence = grabSentance();
+    //Grabs the words from the sentence, returns as an array of words
+    let wordsArray = textGrabber(sentenceStartPos, sentenceEndPos);
 
-    //Break sentance down into array of words
-    let arrayOfWords = breakDance(currentSentence);
+    //Checks words array against prefill suggestions
+    let checkedArray = checkSuggestions(wordsArray);
 
-    //Check if words are in the suggestions json
-    let possibleSens = symbolicSiever(arrayOfWords);
+    //Update the global suggestions array - UPDATE WHEN FUNCTION FOR POSITING SUGGESTIONS IS MADE
+    globalSuggestions = checkedArray;
 
-    //Sort suggestions by most likely using levenshtein distance
-    let sortedSuggestions = suggestionSorter(possibleSens);
-
-    //Write out suggestions to the html page
-    writeSuggestions(currentSuggestions);
-
-    //Write out suggestion logic here
-    suggestionLogic();
+    //Post them to the the suggestion fields
+    listSuggestions.value = globalSuggestions;
 }
 
 
+//Grabs the position of the current sentence and returns it
+function smolGrabber(){
 
-//grabSentance()
+    //Grabs text from current string field
+    let currentStringValue = currentStringField.value;
 
-////Grab current sentance - NEEDS UPDATING TO WORK
-//function grabSentance() {
+    //Gimme that length
+    let currentStringLength = currentStringValue.length;
 
-//    // Listen for input events in the textarea
-//    currentString.addEventListener("input", function () {
+    //Current position of the cursor
+    let cursorPosition = currentStringField.selectionStart;
 
-//        // Get the current text from the textarea
-//        const text = currentString.value;
+    //Update global variable for cursor position
+    lastCursorSpot = cursorPosition;
 
-//        // Split the text into sentences based on periods
-//        const sentences = text.split('.');
+    //Set up for looping periods grabbers
+    let periodPositions = [0];
 
-//        // Trim leading and trailing whitespace from each sentence
-//        const trimmedSentences = sentences.map(sentence => sentence.trim());
+    //Grab them little dots
+    for(let i = 0; i < currentStringLength; i++){
 
-//        // Get the last sentence (the one the user is currently typing)
-//        const current = trimmedSentences[trimmedSentences.length - 1];
+        if(currentStringValue[i] === "."){
 
-//        return current;
-
-//        //// Display the current sentence in the paragraph element
-//        //currentSentence.textContent = current;
-//    });
+            periodPositions.push(i);
+        }
+    }
 
 
-//    console.log(currentString);
+    //Takes current text caret pos and determines which periods it's between.
+    let startOfSentence
+    let endOfSentence
 
+    for (let i = 0; i < periodPositions.length; i++) {
+        if (periodPositions[i] === cursorPosition) {
+          // If the current number is equal to the target, return it as both below and above.
+          startOfSentence = endOfSentence = periodPositions[i];
+          break;
+        }
     
-//}
+        if (periodPositions[i] < cursorPosition) {
+          startOfSentence = periodPositions[i]; // Update the closest number below.
+        } else {
+          endOfSentence = periodPositions[i]; // Update the closest number above.
+          break; // Since the array is sorted, no need to continue checking further.
+        }
+      }
+
+      //Update global variables on the stenence start and stops
+      currentSentenceGlobalStart = startOfSentence;
+      currentSentenceGlobalEnd = endOfSentence;
+
+      return [startOfSentence, endOfSentence];
+}
 
 
+//Grabs the sentence from smolGrabber positions. Returns array of words from sentence
+function textGrabber(startingPos, endingPos){
+
+    //Grab all text and return it based on string positions supplied
+    let extractedText = currentStringField.value.substring(startingPos, endingPos);
+
+    //Split string into induvidual words
+    let wordsArray = extractedText.split(" ");
+
+    //Filters out list of words
+    return filterKilter(wordsArray);
+}
 
 
+//Calculates and sorts the suggestions based on the words supplied
+function checkSuggestions(wordsArray) {
 
+    // Function for Levenshtein distance
+    function levenshteinDistance(str1, str2) {
+        const m = str1.length;
+        const n = str2.length;
+        const dp = Array.from(Array(m + 1), () => Array(n + 1).fill(0));
 
-
-
-
-function textInput() {
-    // Function to find the current sentence based on cursor position
-    function findCurrentSentence(inputText, cursorPosition) {
-        // Define a regular expression to split text into sentences (periods, question marks, and exclamation marks)
-        const sentenceRegex = /([.!?:\n])/g;
-        const sentences = inputText.split(sentenceRegex);
-
-        // Find the current sentence based on the cursor position
-        let currentSentence = '';
-        let currentIndex = 0;
-        for (let i = 0; i < sentences.length; i++) {
-            if (currentIndex + sentences[i].length >= cursorPosition) {
-                currentSentence = sentences[i];
-                break;
+        for (let i = 0; i <= m; i++) {
+            for (let j = 0; j <= n; j++) {
+                if (i === 0) dp[i][j] = j;
+                else if (j === 0) dp[i][j] = i;
+                else {
+                    const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j - 1] + cost,
+                        dp[i][j - 1] + 1,
+                        dp[i - 1][j] + 1
+                    );
+                }
             }
-            currentIndex += sentences[i].length;
         }
 
-        return currentSentence.trim();
+        return dp[m][n];
     }
 
-    // Find the paragraph element by its id
-    const currentString = document.getElementById("currentString");
 
-    // Add an event listener to the paragraph to monitor user input
-    currentString.addEventListener("input", () => {
-        // Get the updated text and cursor position
-        const updatedText = currentString.textContent;
-        const cursorPosition = getCursorCharacterPosition(currentString);
-        console.log(cursorPosition);
+    //Combining the words into a single string for comparison
+    const currentString = wordsArray.join(" ");
 
-        // Find the current sentence based on the cursor position
-        const currentSentence = findCurrentSentence(updatedText, cursorPosition);
 
-        // Send the current sentence to another function for evaluation
-        evaluateString(currentSentence);
+    //Filters entries in the fillerJsonArray that contain all the words in wordsArray
+    const filteredEntries = fillerJsonArray
+        .map((sentenceArray, index) => {
+            const sentence = sentenceArray.join(" ");
+            const words = sentence.split(/\s+/);
+            const matchingWords = wordsArray.filter(word => words.includes(word));
+            return { index, matchingWords, sentence };
+        })
+        .filter(item => item.matchingWords.length === wordsArray.length);
+
+    //Calculating Levenshtein distance for each filtered entry
+    const suggestionList = filteredEntries.map(item => {
+        const distance = levenshteinDistance(currentString, item.sentence);
+        return { ...item, distance };
     });
 
-    // Function to get the cursor position within a contenteditable element
-    function getCursorCharacterPosition(el) {
-        const selection = window.getSelection();
-        if (selection.rangeCount === 0) return 0;
+    //Sorts top suggestion by levenstein distance
+    const topSuggestions = suggestionList
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 5)
+        .map(item => item.sentence);
 
-        const range = selection.getRangeAt(0);
-        const clonedRange = range.cloneRange();
-        clonedRange.selectNodeContents(el);
-        clonedRange.setEnd(range.endContainer, range.endOffset);
-
-        return clonedRange.toString().length;
-    }
-}
-
-// Example function for evaluating the current sentence
-function evaluateString(currentSentence) {
-    // Replace this with your own logic to evaluate the sentence
-    console.log("Current Sentence:", currentSentence);
-}
-
-textInput(); // Call the textInput function to initialize it
-
-
-
-
-
-
-
-//Break words down from sentance into array of words - NEEDS UPDATING TO WORK
-function breakDance(passthrough) {
-
-let currentString = grabSentance();
-    let currentStringArray = currentString.split(" ");
-
-    console.log(currentStringArray);
-
-    return currentStringArray;
-
+    return topSuggestions;
 }
 
 
-//Check if words are in the array of suggestions - NEEDS UPDATING TO WORK
-function symbolicSiever(passsthrough) {
-
-
-}
-
-
-
-
-
-
-//Displays suggestions in the html page - NEEDS UPDATING TO WORK
-function showeStopper(passThrough) {
-
-}
-
-
-
-
-//Write out suggestions to the html page
-function writeSuggestions(passthrough) {
+// //Write out suggestions to the html page
+// function writeSuggestions(passthrough) {
 
    
 
-    document.getElementById("listSuggestions").innerHTML = suggestionsJson[0]["DDSpatientlocationDDS"]["suggestions"];
+//     document.getElementById("listSuggestions").innerHTML = suggestionsJson[0]["DDSpatientlocationDDS"]["suggestions"];
 
-}
+// }
 
 
-// For storing keyboard shortcutKeyss
+//Stores keyboard shortcuts
 function shortcutKeys() {
     currentStringField.addEventListener("keydown", function (event) {
 
-        // Grab keypress
+        //Updates/grabs keypress
         const keyPressed = event.key;
 
-        //// Console log keypress for testing
-        //console.log(`Key Pressed: ${keyPressed}`);
-
-        // Tab key for moving to the next DDS
+        //Moves text caret to the next DDS mark and hightlights it
         if (event.key === "Tab") {
 
             event.preventDefault();
 
-            console.log("Tab key pressed!");
             const [ddsStart, ddsEnd] = searchDDS();
 
             if (ddsStart !== -1 && ddsEnd !== -1) {
@@ -202,31 +200,55 @@ function shortcutKeys() {
             }
         }
 
+
         //Cycle down through suggestions
-         if (event.key === "ArrowDown") {
-            console.log("Arrow Down key pressed!");
+         if (event.ctrlKey && event.key === ".") {
+
+            event.preventDefault();
         }
+
+
+        //Cycle up through suggestions
+        if (event.ctrlKey && event.key === ",") {
+
+            event.preventDefault();
+        }
+
 
         //Push the current working string into the overall narritive, then clear the current string
         if (event.ctrlKey && event.key === "Enter") {
+
+            event.preventDefault();
 
             document.getElementById('narrative').value = document.getElementById('narrative').value + document.getElementById('currentString').value + '\n\n';
             document.getElementById('currentString').value = '';
         }
 
+
         //For inserting suggestions into the current string
         if (event.ctrlKey && event.key === " ") {
+
             event.preventDefault();
 
-            console.log("inserting new suggestion");
-            //let currentString = document.getElementById('currentString').value;
-            //let currentSuggestion = document.getElementById('listSuggestions').value;
-            //document.getElementById('currentString').value = currentString + currentSuggestion;
-        }
+            // // Replace highlighted text with first suggestion and add a space
+            // if (currentStringField[currentSentenceGlobalEnd] === ".") {
+                currentStringField.value = currentStringField.value.replace(currentStringField.value.substring(currentSentenceGlobalStart + 1, currentSentenceGlobalEnd), " " + globalSuggestions[0]);
+            // } else {
+            //     currentStringField.value = currentStringField.value.replace(currentStringField.value.substring(currentSentenceGlobalStart + 1, currentSentenceGlobalEnd), " " + globalSuggestions[0] + ". ");
+            // }
 
+            // Find position of next period
+            for (let i = lastCursorSpot; i < currentStringField.value.length; i++) {
+                if (currentStringField.value[i] === ".") {
+                    console.log(i);
+                    currentStringField.setSelectionRange(i + 2, i + 2);
+                    break; // Exit the loop when a period is found
+                }
+                currentStringField.setSelectionRange(i + 1, i + 1);
+            }
 
-    });
-}
+    };
+})}
 
 
 // Searches strings for DDS mark and retusn the position of the DDS as well as the ending position of that word
@@ -235,33 +257,32 @@ function searchDDS() {
     let DDS = currentStringField.value.search("DDS");
 
     if (DDS !== -1) {
-        //console.log("DDS found");
-        //console.log(DDS);
 
         let posData = findEndOfWord(currentStringField.value, DDS);
 
         return [DDS, posData];
+
     } else {
 
-        console.log("DDS not found");
-        return [-1, -1]; // Return an array with both values set to -1 to indicate not found
+        return [-1, -1];
     }
 
     function findEndOfWord(text, startIndex) {
-        // Initialize variables to store the end position and the characters to check for
+
+        //Initialize variables to store the end position and the characters to check for
         let endPosition = startIndex;
         const validChars = [' ', '.'];
 
-        // Iterate from the startIndex to the end of the string
+        //Iterate from the startIndex to the end of the string
         while (endPosition < text.length) {
             const currentChar = text[endPosition];
 
-            // Check if the current character is a space or a period
+            //Check if the current character is a space or a period
             if (validChars.includes(currentChar)) {
                 break; // Stop when a space or period is found
             }
 
-            // Move to the next character
+            //Move to the next character
             endPosition++;
         }
 
@@ -270,25 +291,17 @@ function searchDDS() {
 }
 
 
-
-
-
-
-
-
-
-
-
 //Calls and updates json variables
-
 var suggestionsJson = [];
 var sectionsJson = [];
+var fillerJson = [];
+var fillerJsonArray = [];
 
 fetch(chrome.runtime.getURL('suggestions.json'))
     .then(response => response.json())
     .then(data => {
         suggestionsJson = data;
-        console.log(suggestionsJson);
+        //console.log(suggestionsJson);
     })
     .catch(error => {
         console.error('Error loading JSON:', error);
@@ -298,7 +311,17 @@ fetch(chrome.runtime.getURL('sections.json'))
     .then(response => response.json())
     .then(data => {
         sectionsJson = data;
-        console.log(sectionsJson);
+        //console.log(sectionsJson);
+    })
+    .catch(error => {
+        console.error('Error loading JSON:', error);
+    });
+
+fetch(chrome.runtime.getURL('filler.json'))
+    .then(response => response.json())
+    .then(data => {
+        fillerJson = data;
+        fillerJsonArray = jsonStringToArray(fillerJson);
     })
     .catch(error => {
         console.error('Error loading JSON:', error);
@@ -306,7 +329,6 @@ fetch(chrome.runtime.getURL('sections.json'))
 
 
 //Imports sections of the prewritten narritive into the current text slot
-
 document.querySelectorAll('.section-button').forEach(function (button) {
 
     button.addEventListener('click', function () {
@@ -317,9 +339,7 @@ document.querySelectorAll('.section-button').forEach(function (button) {
 });
 
 
-
-//THIS BELOW IS THE OLD CODE, NEED TO UPDATE IT TO BE DYNAMIC.
-
+//Setup for importing values
 function importSections(section, id) {
 
     switch (section) {
@@ -362,7 +382,6 @@ function importSections(section, id) {
 
 
 //Function here to move popup to a window
-
 document.getElementById('makebig').addEventListener('click', makeIntoWindow);
 
 function makeIntoWindow() {
@@ -380,11 +399,6 @@ function makeIntoWindow() {
 }
 
 
-
-
-
-
-
 // Function to auto-resize the textarea based on its content
 function autoResizeTextarea() {
     var textarea = document.getElementById('currentString');
@@ -392,9 +406,56 @@ function autoResizeTextarea() {
     textarea.style.height = textarea.scrollHeight + 'px'; // Set the height to the scrollHeight
 }
 
-// Attach the autoResizeTextarea function to the textarea's input event
-document.getElementById('currentString').addEventListener('input', autoResizeTextarea);
 
-// Optionally, you can call the function initially to set the height based on the content
+
+
+shortcutKeys();
 autoResizeTextarea();
-/*shortcutKeys();*/
+
+
+
+
+
+
+
+
+//------------------------------Function that are setups for others------------------------------//
+
+
+
+
+
+
+
+//Converts filler strings into arrays of words from each string. So entry 0 will go from a string to an array of words of that same string
+function jsonStringToArray(array){
+
+    // Create a new array by mapping over the input array
+    let newArray = array.map(item => {
+        // Split each string into an array of words and filter it
+        return filterKilter(item.split(" "));
+    });
+
+    return newArray;
+}
+
+
+//Filter out bits and pieces from the words such as periods and commas and extra spaces
+function filterKilter(wordsArray){
+
+    let thingsToFilter = [".", ",", "!", "?", ":", ";", "(", ")", "-", " ", "\n", ""];
+
+    for(let i = 0; i < wordsArray.length; i++){
+            
+            for(let j = 0; j < thingsToFilter.length; j++){
+    
+                if(wordsArray[i] === thingsToFilter[j]){
+    
+                    wordsArray.splice(i, 1);
+                }
+            }
+        }
+
+
+        return wordsArray;
+}
