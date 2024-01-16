@@ -1,46 +1,38 @@
-//I feel like I use this function enoguh that I should just turn it into a modular bit/library for suture use. 
-//Should send in string being evaluated from the current text and an array of strings to compare against.
-//Returns and array of strings that are suggestions. Might make a setting to swtich to postions if need be.
+//Modular function to check for similar strings in an array
+function stringSeeker(currentString, arrayToCompare) {
+
+    //Define current array
+    let workingCurrentString = stringPrepper(currentString);
 
 
-//Calculates and sorts the suggestions based on the words supplied
-function stringSeeker(currentString, symphonicStringsArray) {
+    //Set up new array to stroe filtered entries
+    let filteredEntries = [];
 
-    
+    //For each loop to run through arrayToCompare. Filters each string into words, checks against current string to see if all the words in the current string are in the arrayToCompare string then pushes the string into filteredEntries
+    arrayToCompare.forEach(item => {
 
-    
+        //Prep the string for comparison
+        let workingArray = stringPrepper(item);
 
+        //Compare the two arrays
+        let results = workingCurrentString.every(val => workingArray.includes(val));
 
-    //Combining the words into a single string for comparison
-    const currentString = wordsArray.join(" ");
-
-
-    //Filters entries in the fillerJsonArray that contain all the words in wordsArray
-    const filteredEntries = fillerJsonArray
-        .map((sentenceArray, index) => {
-            const sentence = sentenceArray.join(" ");
-            const words = sentence.split(/\s+/);
-            const matchingWords = wordsArray.filter(word => words.includes(word));
-            return { index, matchingWords, sentence };
-        })
-        .filter(item => item.matchingWords.length === wordsArray.length);
-
-    //Calculating Levenshtein distance for each filtered entry
-    const suggestionList = filteredEntries.map(item => {
-        const distance = levenshteinDistance(currentString, item.sentence);
-        return { ...item, distance };
+        //If the results are true, then return the string
+        if (results === true) {
+            filteredEntries.push(item);
+        }
     });
 
-    //Sorts top suggestion by levenstein distance
-    const topSuggestions = suggestionList
+
+    // Calculate Levenshtein distance for each filtered entry and sort top suggestions
+    const topSuggestions = filteredEntries
+        .map(item => ({ ...item, distance: levenshteinDistance(currentString, item.sentence) }))
         .sort((a, b) => a.distance - b.distance)
         .slice(0, 5)
         .map(item => item.sentence);
 
+
     return topSuggestions;
-
-
-
 
 
     //Calculates the Levenshtein distance between two strings, returns the distance.
@@ -66,55 +58,33 @@ function stringSeeker(currentString, symphonicStringsArray) {
 
         return dp[m][n];
     }
-}
 
 
+    //Preps and removes random bits from the string to compare
+    function stringPrepper(inputString) {
+        //Prep the string for comparison
+        inputString = inputString.toLowerCase();
 
-//Down here be the functions to split and filter the text
+        //Split string into individual words
+        let wordsArray = inputString.split(" ");
 
-//Converts filler strings into arrays of words from each string. So entry 0 will go from a string to an array of words of that same string
-function jsonStringToArray(array){
+        //Create a new array to store filtered words
+        let filteredWordsArray = [];
 
-    // Create a new array by mapping over the input array
-    let newArray = array.map(item => {
-        // Split each string into an array of words and filter it
-        return filterKilter(item.split(" "));
-    });
+        //Define characters and symbols to filter out
+        let thingsToFilter = [".", ",", "!", "?", ":", ";", "(", ")", "-", " ", "\n", ""];
 
-    return newArray;
-}
+        //Iterate through wordsArray and filter out unwanted characters
+        for (let i = 0; i < wordsArray.length; i++) {
 
+            let word = wordsArray[i];
 
-//Filter out bits and pieces from the words such as periods and commas and extra spaces
-function filterKilter(wordsArray){
-
-    let thingsToFilter = [".", ",", "!", "?", ":", ";", "(", ")", "-", " ", "\n", ""];
-
-    for(let i = 0; i < wordsArray.length; i++){
-            
-            for(let j = 0; j < thingsToFilter.length; j++){
-    
-                if(wordsArray[i] === thingsToFilter[j]){
-    
-                    wordsArray.splice(i, 1);
-                }
+            //Check if the word is not in thingsToFilter
+            if (!thingsToFilter.includes(word)) {
+                filteredWordsArray.push(word);
             }
         }
 
-
-        return wordsArray;
-}
-
-
-//Grabs the sentence from smolGrabber positions. Returns array of words from sentence
-function textGrabber(startingPos, endingPos){
-
-    //Grab all text and return it based on string positions supplied
-    let extractedText = currentStringField.value.substring(startingPos, endingPos);
-
-    //Split string into induvidual words
-    let wordsArray = extractedText.split(" ");
-
-    //Filters out list of words
-    return filterKilter(wordsArray);
+        return filteredWordsArray;
+    }
 }
