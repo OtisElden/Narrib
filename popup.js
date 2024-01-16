@@ -31,16 +31,110 @@ function subtleSuggestios() {
 
 
 
+//grabSentance()
+
+////Grab current sentance - NEEDS UPDATING TO WORK
+//function grabSentance() {
+
+//    // Listen for input events in the textarea
+//    currentString.addEventListener("input", function () {
+
+//        // Get the current text from the textarea
+//        const text = currentString.value;
+
+//        // Split the text into sentences based on periods
+//        const sentences = text.split('.');
+
+//        // Trim leading and trailing whitespace from each sentence
+//        const trimmedSentences = sentences.map(sentence => sentence.trim());
+
+//        // Get the last sentence (the one the user is currently typing)
+//        const current = trimmedSentences[trimmedSentences.length - 1];
+
+//        return current;
+
+//        //// Display the current sentence in the paragraph element
+//        //currentSentence.textContent = current;
+//    });
 
 
-//Grab current sentance - NEEDS UPDATING TO WORK
-function grabSentance() {
+//    console.log(currentString);
 
-    let currentString = document.getElementById('currentString').value;
-    console.log(currentString);
+    
+//}
 
-    return currentString;
+
+
+
+
+
+
+
+
+function textInput() {
+    // Function to find the current sentence based on cursor position
+    function findCurrentSentence(inputText, cursorPosition) {
+        // Define a regular expression to split text into sentences (periods, question marks, and exclamation marks)
+        const sentenceRegex = /([.!?:\n])/g;
+        const sentences = inputText.split(sentenceRegex);
+
+        // Find the current sentence based on the cursor position
+        let currentSentence = '';
+        let currentIndex = 0;
+        for (let i = 0; i < sentences.length; i++) {
+            if (currentIndex + sentences[i].length >= cursorPosition) {
+                currentSentence = sentences[i];
+                break;
+            }
+            currentIndex += sentences[i].length;
+        }
+
+        return currentSentence.trim();
+    }
+
+    // Find the paragraph element by its id
+    const currentString = document.getElementById("currentString");
+
+    // Add an event listener to the paragraph to monitor user input
+    currentString.addEventListener("input", () => {
+        // Get the updated text and cursor position
+        const updatedText = currentString.textContent;
+        const cursorPosition = getCursorCharacterPosition(currentString);
+        console.log(cursorPosition);
+
+        // Find the current sentence based on the cursor position
+        const currentSentence = findCurrentSentence(updatedText, cursorPosition);
+
+        // Send the current sentence to another function for evaluation
+        evaluateString(currentSentence);
+    });
+
+    // Function to get the cursor position within a contenteditable element
+    function getCursorCharacterPosition(el) {
+        const selection = window.getSelection();
+        if (selection.rangeCount === 0) return 0;
+
+        const range = selection.getRangeAt(0);
+        const clonedRange = range.cloneRange();
+        clonedRange.selectNodeContents(el);
+        clonedRange.setEnd(range.endContainer, range.endOffset);
+
+        return clonedRange.toString().length;
+    }
 }
+
+// Example function for evaluating the current sentence
+function evaluateString(currentSentence) {
+    // Replace this with your own logic to evaluate the sentence
+    console.log("Current Sentence:", currentSentence);
+}
+
+textInput(); // Call the textInput function to initialize it
+
+
+
+
+
 
 
 //Break words down from sentance into array of words - NEEDS UPDATING TO WORK
@@ -141,8 +235,8 @@ function searchDDS() {
     let DDS = currentStringField.value.search("DDS");
 
     if (DDS !== -1) {
-        console.log("DDS found");
-        console.log(DDS);
+        //console.log("DDS found");
+        //console.log(DDS);
 
         let posData = findEndOfWord(currentStringField.value, DDS);
 
@@ -303,4 +397,4 @@ document.getElementById('currentString').addEventListener('input', autoResizeTex
 
 // Optionally, you can call the function initially to set the height based on the content
 autoResizeTextarea();
-shortcutKeys();
+/*shortcutKeys();*/
