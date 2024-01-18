@@ -27,14 +27,16 @@ document.getElementById('currentString').addEventListener('keyup', suggestionSup
 //Main function
 function suggestionSupplier(){
 
-    //Desctrcutres the array into the start and end of the sentence
+    //Destructrues array for start and end position.
     let [sentenceStartPos, sentenceEndPos] = smolGrabber();
 
     //Grabs the words from the sentence, returns as an array of words
-    let wordsArray = textGrabber(sentenceStartPos, sentenceEndPos);
+    let currentWords = currentStringField.value.substring(sentenceStartPos, sentenceEndPos);
 
     //Checks words array against prefill suggestions
-    let checkedArray = checkSuggestions(wordsArray);
+    let checkedArray = stringSeeker(currentWords, fillerJson);
+
+    console.log(checkedArray);
 
     //Update the global suggestions array - UPDATE WHEN FUNCTION FOR POSITING SUGGESTIONS IS MADE
     globalSuggestions = checkedArray;
@@ -99,24 +101,51 @@ function smolGrabber(){
 }
 
 
-//Grabs the sentence from smolGrabber positions. Returns array of words from sentence
-function textGrabber(startingPos, endingPos){
+//Modular function to check for similar strings in an array
+function stringSeeker(currentString, arrayToCompare) {
 
-    //Grab all text and return it based on string positions supplied
-    let extractedText = currentStringField.value.substring(startingPos, endingPos);
-
-    //Split string into induvidual words
-    let wordsArray = extractedText.split(" ");
-
-    //Filters out list of words
-    return filterKilter(wordsArray);
-}
+    //Define current array
+    let workingCurrentString = stringPrepper(currentString);
 
 
-//Calculates and sorts the suggestions based on the words supplied
-function checkSuggestions(wordsArray) {
+    //Set up new array to stroe filtered entries
+    let filteredEntries = [];
 
-    // Function for Levenshtein distance
+    //For each loop to run through arrayToCompare. Filters each string into words, checks against current string to see if all the words in the current string are in the arrayToCompare string then pushes the string into filteredEntries
+    arrayToCompare.forEach(item => {
+
+        //Prep the string for comparison
+        let workingArray = stringPrepper(item);
+
+        //Compare the two arrays
+        let results = workingCurrentString.every(val => workingArray.includes(val));
+
+        //If the results are true, then return the string
+        if (results === true) {
+            filteredEntries.push(item);
+        }
+
+        //console.log(filteredEntries);
+    });
+
+
+    // Calculate Levenshtein distance for each filtered entry and sort top suggestions
+    const topSuggestions = filteredEntries
+        .map(item => ({ ...item, distance: levenshteinDistance(currentString, item) }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 5)
+        .map(item => {
+            // Exclude the 'distance' property
+            const { distance, ...rest } = item;
+            return Object.values(rest).join('');
+        }); // Join the values of the object
+
+   
+
+    return topSuggestions;
+
+
+    //Calculates the Levenshtein distance between two strings, returns the distance.
     function levenshteinDistance(str1, str2) {
         const m = str1.length;
         const n = str2.length;
@@ -141,44 +170,34 @@ function checkSuggestions(wordsArray) {
     }
 
 
-    //Combining the words into a single string for comparison
-    const currentString = wordsArray.join(" ");
+    //Preps and removes random bits from the string to compare
+    function stringPrepper(inputString) {
+        //Prep the string for comparison
+        inputString = inputString.toLowerCase();
 
+        //Split string into individual words
+        let wordsArray = inputString.split(" ");
 
-    //Filters entries in the fillerJsonArray that contain all the words in wordsArray
-    const filteredEntries = fillerJsonArray
-        .map((sentenceArray, index) => {
-            const sentence = sentenceArray.join(" ");
-            const words = sentence.split(/\s+/);
-            const matchingWords = wordsArray.filter(word => words.includes(word));
-            return { index, matchingWords, sentence };
-        })
-        .filter(item => item.matchingWords.length === wordsArray.length);
+        //Create a new array to store filtered words
+        let filteredWordsArray = [];
 
-    //Calculating Levenshtein distance for each filtered entry
-    const suggestionList = filteredEntries.map(item => {
-        const distance = levenshteinDistance(currentString, item.sentence);
-        return { ...item, distance };
-    });
+        //Define characters and symbols to filter out
+        let thingsToFilter = [".", ",", "!", "?", ":", ";", "(", ")", "-", " ", "\n", ""];
 
-    //Sorts top suggestion by levenstein distance
-    const topSuggestions = suggestionList
-        .sort((a, b) => a.distance - b.distance)
-        .slice(0, 5)
-        .map(item => item.sentence);
+        //Iterate through wordsArray and filter out unwanted characters
+        for (let i = 0; i < wordsArray.length; i++) {
 
-    return topSuggestions;
+            let word = wordsArray[i];
+
+            //Check if the word is not in thingsToFilter
+            if (!thingsToFilter.includes(word)) {
+                filteredWordsArray.push(word);
+            }
+        }
+
+        return filteredWordsArray;
+    }
 }
-
-
-// //Write out suggestions to the html page
-// function writeSuggestions(passthrough) {
-
-   
-
-//     document.getElementById("listSuggestions").innerHTML = suggestionsJson[0]["DDSpatientlocationDDS"]["suggestions"];
-
-// }
 
 
 //Stores keyboard shortcuts
